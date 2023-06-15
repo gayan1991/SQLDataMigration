@@ -15,18 +15,6 @@
     <Content Include="MigrationConfig.json">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
-	  <None Include="MigrationConfig.Dev.json">
-		  <DependentUpon>MigrationConfig.json</DependentUpon>
-	  </None>
-	  <None Include="MigrationConfig.Stage.json">
-		  <DependentUpon>MigrationConfig.json</DependentUpon>
-	  </None>
-	  <None Include="MigrationConfig.Prod.json">
-		  <DependentUpon>MigrationConfig.json</DependentUpon>
-	  </None>
-	  <None Include="MigrationConfig.Local.json">
-		  <DependentUpon>MigrationConfig.json</DependentUpon>
-	  </None>
   </ItemGroup>
 
   <ItemGroup>

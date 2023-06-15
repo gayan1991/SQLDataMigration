@@ -7,9 +7,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Config.Infrastructer\Config.Infrastructure.csproj" />
-    <ProjectReference Include="..\Ref.Infrastructer\Ref.Infrastructer.csproj" />
-    <ProjectReference Include="..\Report.Infrastructer\Report.Infrastructer.csproj" />
+    <ProjectReference Include="..\..\test\Migration.Test\Migration.Test.csproj" />
   </ItemGroup>
 
 </Project>

@@ -5,11 +5,11 @@ namespace Migration.Core
 {
     public class MigrationConfiguration
     {
-        public string SourceServer { get; set; }
-        public string SourceDb { get; set; }
-        public string TargetServer { get; set; }
-        public string TargetDb { get; set; }
-        public DBTypeEnum DbType { get; set; }
+        public string SourceServer { get; set; } = null!;
+        public string SourceDb { get; set; } = null!;
+        public string TargetServer { get; set; } = null!;
+        public string TargetDb { get; set; } = null!;
+        public int DbContextId { get; set; }
     }
 
     public static class ConnectionModelExtension

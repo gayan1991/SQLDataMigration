@@ -1,8 +1,6 @@
 ﻿using Db.Infrastructure.DatabaseServices.Interface;
 using Db.Infrastructure.Enums;
 using Db.Infrastructure.Migrations;
-using Db.Infrastructure.Util;
-using Microsoft.EntityFrameworkCore;
 using Migration.Core.Interface;
 using System.Reflection;
 
@@ -32,7 +30,7 @@ namespace Migration.Core
             _logger.WriteLine("Target server connection model is set");
 
             _databaseService.SetUpLogger(_logger);
-            var status = await ConnectDB(targetServer, config.DbType, true, true);
+            var status = await ConnectDB(targetServer, config.DbContextId, true, true);
 
             if (status.Status == Status.Exist)
             {
@@ -41,14 +39,14 @@ namespace Migration.Core
 
                 if (!string.IsNullOrEmpty(response) && response.ToUpper() == "Y")
                 {
-                    await _databaseService.ResetDb(config.DbType, targetServer);
+                    await _databaseService.ResetDb(config.DbContextId, targetServer);
                 }
-            }            
+            }
 
             var completionStatus = new List<(bool, string)>();
-            foreach (var entityType in (await _databaseService.GetEntities(config.DbType, targetServer)).Values)
+            foreach (var entityType in (await _databaseService.GetEntities(config.DbContextId, targetServer)).Values)
             {
-                var resultObjTask = ExecuteAsync<Migration>(_databaseService, nameof(IDatabaseService.GenerateResultModels), entityType.ClrType, config.DbType, targetServer, entityType);
+                var resultObjTask = ExecuteAsync<Migration>(_databaseService, nameof(IDatabaseService.GenerateResultModels), entityType.ClrType, config.DbContextId, targetServer, entityType);
 
                 if (resultObjTask is null)
                     continue;
@@ -65,14 +63,14 @@ namespace Migration.Core
                 if (resultObj is null)
                     continue;
 
-                var resultsTask = ExecuteAsync<Migration>(_databaseService, nameof(IDatabaseService.GetResults), entityType.ClrType, config.DbType, sourceServer, resultObj);
+                var resultsTask = ExecuteAsync<Migration>(_databaseService, nameof(IDatabaseService.GetResults), entityType.ClrType, config.DbContextId, sourceServer, resultObj);
 
                 if (resultsTask is null)
                     continue;
 
                 await resultsTask.ConfigureAwait(false);
 
-                var insertTask = ExecuteAsync<Migration>(_databaseService, nameof(IDatabaseService.InsertResults), entityType.ClrType, config.DbType, targetServer, resultObj, entityType);
+                var insertTask = ExecuteAsync<Migration>(_databaseService, nameof(IDatabaseService.InsertResults), entityType.ClrType, config.DbContextId, targetServer, resultObj, entityType);
 
                 if (insertTask is null)
                     continue;
@@ -81,7 +79,7 @@ namespace Migration.Core
 
                 if (resultObj.GetType()?.GetProperty("IsSuccessful")?.GetValue(resultObj) is bool successVal)
                 {
-                    completionStatus.Add(new (successVal, $"Migrations status {(successVal ? "COMPLETED" : "FAILED")} for {entityType.EntityType.Name}"));
+                    completionStatus.Add(new(successVal, $"Migrations status {(successVal ? "COMPLETED" : "FAILED")} for {entityType.EntityType.Name}"));
                 }
             }
 
@@ -99,9 +97,9 @@ namespace Migration.Core
 
         #region Private
 
-        private Task<DbStatus> ConnectDB(ConnectionModel connection, DBTypeEnum dBType, bool migrate = false, bool seedData = false)
+        private Task<DbStatus> ConnectDB(ConnectionModel connection, int dbContextId, bool migrate = false, bool seedData = false)
         {
-            return _databaseService.ConnectDbAsync(dBType, connection, migrate, seedData);
+            return _databaseService.ConnectDbAsync(dbContextId, connection, migrate, seedData);
         }
 
         private static object? Execute<T>(object obj, string methodName, Type genericType, params object[] parameters)

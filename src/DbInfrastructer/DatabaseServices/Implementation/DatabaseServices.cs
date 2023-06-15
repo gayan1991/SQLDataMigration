@@ -1,5 +1,4 @@
 ﻿using Db.Infrastructure.DatabaseServices.Interface;
-using Db.Infrastructure.Enums;
 using Db.Infrastructure.Extensions;
 using Db.Infrastructure.Migrations;
 using Db.Infrastructure.Util;
@@ -11,27 +10,27 @@ namespace Db.Infrastructure.DatabaseServices.Implementation
 {
     public class DatabaseServices : IDatabaseService
     {
-        private readonly Dictionary<DBTypeEnum, IContextService> keyValuePairs = new();
+        private readonly Dictionary<int, IContextService> keyValuePairs = new();
 
         public void SetUpLogger(IMigrationLogger logger)
         {
             HelperUtil.SetUpLogger(logger);
         }
 
-        public DatabaseServices AddDbContextService(DBTypeEnum type, IContextService contextService)
+        public DatabaseServices AddDbContextService(int dbContextId, IContextService contextService)
         {
-            keyValuePairs.Add(type, contextService);
+            keyValuePairs.Add(dbContextId, contextService);
             return this;
         }
 
-        public async Task ResetDb(DBTypeEnum dBType, ConnectionModel connection)
+        public async Task ResetDb(int dbContextId, ConnectionModel connection)
         {
-            HelperUtil.WriteToConsole($"Reset is started for {Enum.GetName(dBType)} database");
-            await keyValuePairs[dBType].ResetDb(connection);
-            HelperUtil.WriteToConsole($"Reset is completed for {Enum.GetName(dBType)} database");
+            HelperUtil.WriteToConsole($"Reset is started for {dbContextId} database");
+            await keyValuePairs[dbContextId].ResetDb(connection);
+            HelperUtil.WriteToConsole($"Reset is completed for {dbContextId} database");
         }
 
-        public async Task<List<T>> GetResults<T>(DBTypeEnum dBType, ConnectionModel connection) where T : class
+        public async Task<List<T>> GetResults<T>(int dbContextId, ConnectionModel connection) where T : class
         {
             HelperUtil.WriteToConsole($"{nameof(GetResults)} is called to get data for {typeof(T).Name}");
 
@@ -41,12 +40,12 @@ namespace Db.Infrastructure.DatabaseServices.Implementation
                 return null!;
             }
 
-            var result = await keyValuePairs[dBType].GetResults<T>(connection);
+            var result = await keyValuePairs[dbContextId].GetResults<T>(connection);
             HelperUtil.WriteToConsole($"Retrieved {result.Count} records");
             return result;
         }
 
-        public async Task GetResults<T>(DBTypeEnum dBType, ConnectionModel connection, ResultModel<T> resultModel) where T : class
+        public async Task GetResults<T>(int dbContextId, ConnectionModel connection, ResultModel<T> resultModel) where T : class
         {
             HelperUtil.WriteToConsole($"{nameof(GetResults)} is called to get data for {typeof(T).Name}");
             if (typeof(T).IsMigrationConfigType())
@@ -55,16 +54,16 @@ namespace Db.Infrastructure.DatabaseServices.Implementation
                 return;
             }
 
-            await keyValuePairs[dBType].GetResults(connection, resultModel);
+            await keyValuePairs[dbContextId].GetResults(connection, resultModel);
             HelperUtil.WriteToConsole($"Retrieved {resultModel.Count} records");
         }
 
-        //public Task InsertResults<T>(DBTypeEnum dBType, ConnectionModel connection, List<T> values, MigrationEntityMetadata entityMetadata) where T : class
+        //public Task InsertResults<T>(int dbContextId, ConnectionModel connection, List<T> values, MigrationEntityMetadata entityMetadata) where T : class
         //{
-        //    return keyValuePairs[dBType].InsertResults(connection, values, entityMetadata);
+        //    return keyValuePairs[dbContextId].InsertResults(connection, values, entityMetadata);
         //}
 
-        public async Task InsertResults<T>(DBTypeEnum dBType, ConnectionModel connection, ResultModel<T> values, MigrationEntityMetadata entityMetadata) where T : class
+        public async Task InsertResults<T>(int dbContextId, ConnectionModel connection, ResultModel<T> values, MigrationEntityMetadata entityMetadata) where T : class
         {
             HelperUtil.WriteToConsole($"{nameof(InsertResults)} is called to save data for {typeof(T).Name}");
             if (typeof(T).IsMigrationConfigType())
@@ -76,36 +75,36 @@ namespace Db.Infrastructure.DatabaseServices.Implementation
             HelperUtil.WriteToConsole($"{(values.Count > 0 ? "Saving" : "Saved")} {values.Count} records");
             if (values.Count > 0)
             {
-                await keyValuePairs[dBType].InsertResults(connection, values, entityMetadata);
+                await keyValuePairs[dbContextId].InsertResults(connection, values, entityMetadata);
 
                 HelperUtil.WriteToConsole($"Cosumed {values.CompleteTask} to transfer {typeof(T).Name}");
                 await InsertMigrationData(connection, typeof(T).Name, values.Count);
             }
         }
 
-        public async Task<DbStatus> ConnectDbAsync(DBTypeEnum dBType, ConnectionModel connection, bool migrate = false, bool seedData = false)
+        public async Task<DbStatus> ConnectDbAsync(int dbContextId, ConnectionModel connection, bool migrate = false, bool seedData = false)
         {
             var obj = new DbStatus();
             using (var context = new BaseContext<DbContext>(connection))
             {
                 var exists = ((RelationalDatabaseCreator)context.GetService<IDatabaseCreator>()).Exists();
                 obj.Status = exists ? Status.Exist : Status.New;
-            }           
+            }
 
-            HelperUtil.WriteToConsole($"Request is made to to connect to {Enum.GetName(dBType)} database");
-            await keyValuePairs[dBType].ConnectDatabase(connection, migrate, seedData);
-            HelperUtil.WriteToConsole($"Connection is made to {Enum.GetName(dBType)} database");
+            HelperUtil.WriteToConsole($"Request is made to to connect to {dbContextId} database");
+            await keyValuePairs[dbContextId].ConnectDatabase(connection, migrate, seedData);
+            HelperUtil.WriteToConsole($"Connection is made to {dbContextId} database");
 
             return obj;
         }
 
-        public Task<MigrationDictionary> GetEntities(DBTypeEnum dBType, ConnectionModel connection)
+        public Task<MigrationDictionary> GetEntities(int dbContextId, ConnectionModel connection)
         {
-            HelperUtil.WriteToConsole($"Get {Enum.GetName(dBType)} entities");
-            return keyValuePairs[dBType].GetEntities(connection);
+            HelperUtil.WriteToConsole($"Get {dbContextId} entities");
+            return keyValuePairs[dbContextId].GetEntities(connection);
         }
 
-        public async Task<ResultModel<T>> GenerateResultModels<T>(DBTypeEnum dBType, ConnectionModel connection, MigrationEntityMetadata entityMeta)
+        public async Task<ResultModel<T>> GenerateResultModels<T>(int dbContextId, ConnectionModel connection, MigrationEntityMetadata entityMeta)
         {
             HelperUtil.WriteToConsole($"Result Model creation begins for {typeof(T).Name}");
 
@@ -115,7 +114,7 @@ namespace Db.Infrastructure.DatabaseServices.Implementation
                 return null!;
             }
 
-            var result = await keyValuePairs[dBType].GenerateResultModels<T>(connection, entityMeta);
+            var result = await keyValuePairs[dbContextId].GenerateResultModels<T>(connection, entityMeta);
             HelperUtil.WriteToConsole($"ResultModel is created for {typeof(T).Name}");
             HelperUtil.WriteToConsole($"Number of verification queries: {result.VerificationQueryModel.Keys.Count}");
 
@@ -146,7 +145,7 @@ namespace Db.Infrastructure.DatabaseServices.Implementation
             {
                 try
                 {
-                    await context.Database.ExecuteSqlRawAsync("Drop Table [Migration].[DataVerficiationQueries]");
+                    await context.Database.ExecuteSqlRawAsync("Drop Table [Migration].[DataVerificationQueries]");
                     await context.Database.ExecuteSqlRawAsync("Drop Table [Migration].[DataVerification]");
                     await context.Database.ExecuteSqlRawAsync("Drop Table [Migration].[MigrationData]");
                     await transaction.CommitAsync();
