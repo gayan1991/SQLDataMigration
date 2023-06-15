@@ -1,0 +1,79 @@
+﻿[
+  {
+    "SourceServer": "pr-emrsn-cs-valve-configsvr.database.windows.net",
+    "SourceDb": "pr-configdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "configdb",
+    "DbType": "0"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-configsvr.database.windows.net",
+    "SourceDb": "stage-reportdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "reportdb",
+    "DbType": "1"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-cust1-refsvr.database.windows.net",
+    "SourceDb": "cust1-refdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "refDb1",
+    "DbType": "2"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-cust2-refsvr.database.windows.net",
+    "SourceDb": "cust2-refdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "refDb2",
+    "DbType": "2"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-cust3-refsvr.database.windows.net",
+    "SourceDb": "refdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "refDb3",
+    "DbType": "2"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-cust4-refsvr.database.windows.net",
+    "SourceDb": "refdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "refDb4",
+    "DbType": "2"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-cust5-refsvr.database.windows.net",
+    "SourceDb": "refdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "refDb5",
+    "DbType": "2"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-cust6-refsvr.database.windows.net",
+    "SourceDb": "refdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "refDb6",
+    "DbType": "2"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-cust7-refsvr.database.windows.net",
+    "SourceDb": "refdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "refDb7",
+    "DbType": "2"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-cust8-refsvr.database.windows.net",
+    "SourceDb": "refdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "refDb8",
+    "DbType": "2"
+  },
+  {
+    "SourceServer": "pr-emrsn-cs-valve-cust9-refsvr.database.windows.net",
+    "SourceDb": "refdb",
+    "TargetServer": "localhost,1433",
+    "TargetDb": "refDb9",
+    "DbType": "2"
+  }
+]
